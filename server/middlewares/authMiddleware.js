@@ -15,7 +15,7 @@ export const protect = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded; // contains id & role
+    req.claims = decoded; // contains id & role and name
     next();
   } catch (error) {
     return res.status(401).json({

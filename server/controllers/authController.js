@@ -11,7 +11,7 @@ export const register = async (req, res) => {
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: "Email already registered"
+        message: "Mobile already registered"
       });
     }
 
@@ -22,7 +22,7 @@ export const register = async (req, res) => {
     const user = await User.create({
       name,
       mobile,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     return res.status(201).json({
@@ -42,10 +42,10 @@ export const register = async (req, res) => {
 // -------------------- LOGIN --------------------
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { mobile, password } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ mobile });
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
@@ -60,7 +60,8 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role
+        role: user.role,
+        name:user.name
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }

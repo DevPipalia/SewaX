@@ -10,19 +10,21 @@ import {
 } from "../controllers/ticketController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
+import { assignToConstraints, createTicketConstraints, updateTicketPriorityConstraints, updateTicketStatusConstraints } from "../validators/ticketValidator.js";
+import { validate } from "../middlewares/validate.js";
 
 const router = express.Router();
 
-router.post("/create", protect, createTicket);
+router.post("/create", protect,validate(createTicketConstraints), createTicket);
 
 router.get("/my", protect, getMyTickets);
 
 router.get("/all", protect, getAllTickets);
 
-router.post("/:id/updateStatus", protect, updateTicketStatus);
+router.post("/:id/updateStatus", protect,validate(updateTicketStatusConstraints), updateTicketStatus);
 
-router.post("/:id/assign", protect, assignTo);
+router.post("/:id/assign", protect,validate(assignToConstraints), assignTo);
 
-router.post("/:id/updatePriority", protect, updatePriority);
+router.post("/:id/updatePriority", protect,validate(updateTicketPriorityConstraints) ,updatePriority);
 
 export default router;

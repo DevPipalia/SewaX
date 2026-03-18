@@ -70,6 +70,13 @@ export const updateTicketStatus = async (req, res) => {
       { new: true }
     );
 
+    if (!ticket) {
+  return res.status(500).json({
+    success: false,
+    message: "Ticket not found"
+  });
+}
+
     res.json({
       success: true,
       ticket

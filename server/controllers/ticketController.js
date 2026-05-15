@@ -1,32 +1,27 @@
 import Ticket from "../models/Ticket.js";
+import asyncHandler from "../utils/asyncHandler.js";
+
 
 // Create Ticket
-export const createTicket = async (req, res) => {
-  try {
-    const { title, description, flatNo } = req.body;
+export const createTicket = asyncHandler(async (req, res) => {
 
-    const ticket = await Ticket.create({
-      title,
-      description,
-      flatNo,
+   const ticket = await Ticket.create({
+      title: req.body.title,
+      description: req.body.description,
+      flatNo: req.body.flatNo,
       createdBy: req.claims.id
-    });
+   });
 
-    res.status(201).json({
+   res.status(201).json({
       success: true,
       ticket
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
+   });
+
+});
 
 // Get tickets created by logged in user
-export const getMyTickets = async (req, res) => {
-  try {
+export const getMyTickets = asyncHandler( async (req, res) => {
+  
      const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -66,17 +61,13 @@ export const getMyTickets = async (req, res) => {
       totalPages: Math.ceil(totalEntries / limit),
       tickets
     });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
-};
+  
+});
 
 
 
-export const getTicketById = async (req, res) => {
-  try {
+export const getTicketById = asyncHandler(async (req, res) => {
+
     const ticket = await Ticket.findById(req.params.id)
       .populate("createdBy", "name mobile");
 
@@ -91,18 +82,13 @@ export const getTicketById = async (req, res) => {
       success: true,
       ticket
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
+  
+});
 
 
 // Admin: Get all tickets
-export const getAllTickets = async (req, res) => {
-  try {
+export const getAllTickets = asyncHandler( async (req, res) => {
+
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -141,16 +127,12 @@ export const getAllTickets = async (req, res) => {
       totalPages: Math.ceil(totalEntries / limit),
       tickets
     });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
-};
+  
+});
 
 // Admin: Update ticket status
-export const updateTicketStatus = async (req, res) => {
-  try {
+export const updateTicketStatus = asyncHandler(async (req, res) => {
+
     const { status } = req.body;
     const updateData = {
           status
@@ -168,7 +150,9 @@ export const updateTicketStatus = async (req, res) => {
     const ticket = await Ticket.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
+      { new: true, 
+        runValidators: true
+      }
     );
 
     if (!ticket) {
@@ -182,53 +166,44 @@ export const updateTicketStatus = async (req, res) => {
       success: true,
       ticket
     });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
-};
+  
+});
 
 // Admin: AssignTo
-export const assignTo = async (req, res) => {
-  try {
+export const assignTo = asyncHandler(async (req, res) => {
+  
     const { assignedTo } = req.body;
 
     const ticket = await Ticket.findByIdAndUpdate(
       req.params.id,
       { assignedTo },
-      { new: true }
+      { new: true,
+        runValidators: true
+       }
     );
 
     res.json({
       success: true,
       ticket
     });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
-};
+  
+});
 
 // Admin: Update priority
-export const updatePriority = async (req, res) => {
-  try {
+export const updatePriority =asyncHandler( async (req, res) => {
     const { priority } = req.body;
 
     const ticket = await Ticket.findByIdAndUpdate(
       req.params.id,
       { priority },
-      { new: true }
+      { new: true,
+        runValidators: true
+       }
     );
 
     res.json({
       success: true,
       ticket
     });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
-};
+  
+});

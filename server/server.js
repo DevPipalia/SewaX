@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import router from "./routes/index.js";
+import { errorHandler } from "./middlewares/errorMiddleware.js";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api", router);
+app.use(errorHandler);
 
 connectDB();
 

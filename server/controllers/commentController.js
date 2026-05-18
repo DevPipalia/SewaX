@@ -1,55 +1,47 @@
 import Comment from "../models/Comment.js";
 import Ticket from "../models/Ticket.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import sendSuccessResponse from "../utils/sendSuccessResponse.js";
+import AppError from "../utils/appError.js";
 
 // Add comment to ticket
-export const addComment = asyncHandler( async (req, res) => {
-    const  message = req.body.message;
-    const  ticketId  = req.params.ticketId;
+export const addComment = asyncHandler(async (req, res) => {
+  const message = req.body.message;
+  const ticketId = req.params.ticketId;
 
-    const ticket = await Ticket.findById(ticketId);
+  const ticket = await Ticket.findById(ticketId);
 
-      if (!ticket) {
-      return res.status(404).json({
-        success: false,
-        message: "Ticket not found"
-      });
-    }
+  if (!ticket) 
+  {
+    throw new AppError("Ticket not found", 404);
+  }
 
-    if 
-    (
-      req.claims.role !== "admin" &&
-      ticket.createdBy.toString() !== req.claims.id
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: "Not allowed to comment on this ticket"
-      });
-    }
+  if (req.claims.role !== "admin" && ticket.createdBy.toString() !== req.claims.id) 
+  {
+    throw new AppError("Not allowed to comment on this ticket", 403);
+  }
 
-    const comment = await Comment.create({
-      ticketId: ticketId,
-      message,
-      createdBy: req.claims.id
-    });
+  const comment = await Comment.create({
+    ticketId: ticketId,
+    message,
+    createdBy: req.claims.id,
+  });
 
-    res.status(201).json({
-      success: true,
-      comment
-    });
- 
+  sendSuccessResponse(res, {
+    statusCode: 201,
+    message: "Comment added successfully",
+    data: comment,
+  });
 });
 
 // Get comments for a ticket
-export const getComments = asyncHandler( async (req, res) => {
+export const getComments = asyncHandler(async (req, res) => {
+  const comments = await Comment.find({
+    ticketId: req.params.ticketId,
+  }).populate("createdBy", "name");
 
-    const comments = await Comment.find({
-      ticketId: req.params.ticketId
-    }).populate("createdBy", "name");
-
-    res.json({
-      success: true,
-      comments
-    });
-  
+  sendSuccessResponse(res, {
+    message: "Comments fetched successfully",
+    data: comments,
+  });
 });

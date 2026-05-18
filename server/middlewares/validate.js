@@ -1,29 +1,27 @@
 import { ZodError } from "zod";
+import AppError from "../utils/appError.js";
 
 export const validate = (schema) => (req, res, next) => {
   try {
     schema.parse({
       body: req.body,
       params: req.params,
-      query: req.query
+      query: req.query,
     });
 
     next();
   } catch (error) {
     if (error instanceof ZodError) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: error.issues.map((issue) => ({
+      throw new AppError(
+        "Validation failed",
+        400,
+        error.issues.map((issue) => ({
           field: issue.path.join("."),
-          message: issue.message
-        }))
-      });
+          message: issue.message,
+        })),
+      );
     }
 
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong during validation"
-    });
+    throw new AppError("Something went wrong during validation", 500);
   }
 };

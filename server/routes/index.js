@@ -5,7 +5,6 @@ import authRoutes from "./authRoutes.js";
 import ticketRoutes from "./ticketRoutes.js";
 import commentRoutes from "./commentRoutes.js";
 
-
 const router = express.Router();
 
 // router.use("/health", healthRoutes);

@@ -1,13 +1,11 @@
 import jwt from "jsonwebtoken";
+import AppError from "../utils/appError.js";
 
 export const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({
-      success: false,
-      message: "Not authorized, token missing"
-    });
+    throw new AppError("Not authorized, token missing", 401);
   }
 
   const token = authHeader.split(" ")[1];
@@ -15,12 +13,10 @@ export const protect = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.claims = decoded; // contains id & role and name
+    req.claims = decoded;
+
     next();
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Token is invalid or expired"
-    });
+    throw new AppError("Token is invalid or expired", 401);
   }
 };

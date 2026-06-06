@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import sendSuccessResponse from "../utils/sendSuccessResponse.js";
+import env from "../config/env.js";
+
 
 export const register = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({
@@ -59,7 +61,7 @@ export const login = asyncHandler(async (req, res) => {
       role: user.role,
       name: user.name,
     },
-    process.env.JWT_SECRET,
+    env.JWT_SECRET,
     { expiresIn: "1d" },
   );
 
